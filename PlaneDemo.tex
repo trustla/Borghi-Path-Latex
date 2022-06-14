@@ -1,0 +1,50 @@
+\documentclass{article}
+
+\usepackage{graphicx}
+\usepackage{tikz,tikz-3dplot,calc}
+
+\newcommand{\AxisRotator}[1][rotate=0]{%
+    \tikz [x=0.2cm,y=0.2cm,line width=.2ex,-stealth,#1] \draw (0,0) arc (150:-150:1 and 1);%
+}
+\newcommand{\AxisRotatorReverse}[1][rotate=0]{%
+    \tikz [x=0.2cm,y=0.2cm,line width=.2ex,-stealth,#1] \draw (0,0) arc (-150:150:1 and 1);%
+}
+\usetikzlibrary {backgrounds}
+
+\begin{document}
+\tdplotsetmaincoords{70}{-128}
+
+\begin{tikzpicture}[tdplot_main_coords]
+
+    \coordinate (O) at (0,0,0);
+    \coordinate (BPO) at (0,0,-5.6);
+    \coordinate (WBO) at (0,0,-11.2);
+    \coordinate (BackgroundBase) at (0.5,0,0.3);
+    \coordinate (BPSreenShot) at (0.5,0,-5.3);
+    \coordinate (WBSreenShot) at (0.5,0,-10.9);
+
+    \draw[line width= 1,red,->] (O) -- ($(O) + (0,-3,0)$) node[anchor=north east]{$W$} node[midway]{\AxisRotator[rotate = 90]} node[pos=.6,anchor = south west]{$\alpha$};
+    \draw[green,line width= 1,->] (O) -- ($(O) + (3,0,0)$) node[anchor=north west]{$L$}node[midway]{\AxisRotator[rotate = 90]} node[pos=.65,anchor = north west]{$\beta$};
+    \draw[blue,line width= 1,->] (O) -- ($(O) + (0,0,3)$) node[anchor=south]{$H$};
+    \begin{pgfonlayer}{background}
+        \node [inner sep=0pt] at (BackgroundBase)
+            {\pgfimage[interpolate = true, height = 5cm]{Picture1.png}};
+    \end{pgfonlayer}
+
+    \draw[line width= 1,red,->] (BPO) -- ($(BPO) + (3,0,0)$) node[anchor=north east]{$X$} node[midway]{\AxisRotator[rotate = 90]} node[pos=.6,anchor = south west]{$\alpha$};
+    \draw[green,line width= 1,->] (BPO) -- ($(BPO) + (0,3,0)$) node[anchor=north west]{$Y$}node[midway]{\AxisRotatorReverse[rotate = 90]} node[pos=.65,anchor = north west]{$\beta$};
+    \draw[blue,line width= 1,->] (BPO) -- ($(BPO) + (0,0,3)$) node[anchor=south]{$Z$};
+    \begin{pgfonlayer}{background}
+        \node [inner sep=0pt] at (BPSreenShot)
+            {\pgfimage[interpolate = true, height = 5cm]{Combined1.png}};
+    \end{pgfonlayer}
+
+    \draw[line width= 1,red,->] (WBO) -- ($(WBO) + (3,0,0)$) node[anchor=north east]{$X$}node[midway]{\AxisRotatorReverse[rotate = 90]} node[pos=.6,anchor = south west]{$\alpha$};
+    \draw[green,line width= 1,->] (WBO) -- ($(WBO) + (0,3,0)$) node[anchor=north west]{$Y$} node[midway]{\AxisRotatorReverse[rotate = 90]} node[pos=.65,anchor = north west]{$\beta$};
+    \draw[blue,line width= 1,->] (WBO) -- ($(WBO) + (0,0,3)$) node[anchor=south]{$Z$};
+    \begin{pgfonlayer}{background}
+        \node [inner sep=0pt] at (WBSreenShot)
+            {\pgfimage[interpolate = true, height = 5cm]{Combined2.png}};
+    \end{pgfonlayer}
+\end{tikzpicture}
+\end{document}

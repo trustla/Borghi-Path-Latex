@@ -1,0 +1,115 @@
+\documentclass{beamer}
+\usepackage{tikz,tikz-3dplot}
+\begin{document}
+
+\makeatletter
+
+% enhance \tdplotsetmaincoords
+\def\setMain#1#2{
+    % disable \tikzset
+    \let\tikzset\pgfutil@gobble
+    % \tikzset is used here
+    \tdplotsetmaincoords{#1}{#2}
+    % repair \tikzset
+    \def\tikzset{\pgfqkeys{/tikz}}
+    \tikzset{Main/.style={x={(\raarot cm,\rbarot cm)},y={(\rabrot cm, \rbbrot cm)},z={(\racrot cm, \rbcrot cm)}}}
+    % also setup Rotated coordinate
+    \reRotate{0}{0}{0}
+}
+
+% enhance \tdplotsetrotatedcoords by appending the commented lines
+% \resRotated means that the rotation is not accumulated.
+\def\reRotate#1#2#3{
+    % disable \tikzset
+    \let\tikzset\pgfutil@gobble
+    % \tikzset is used here
+    \tdplotsetrotatedcoords{#1}{#2}{#3}
+    % append the commented lines
+    % see the source code tikz-3dplot.sty line 312-323
+    \tdplotmult{\rcaeaa}{\rcarot}{\raaeul}
+    \tdplotmult{\rcbeba}{\rcbrot}{\rbaeul}
+    \tdplotmult{\rcceca}{\rccrot}{\rcaeul}
+    \tdplotmult{\rcaeab}{\rcarot}{\rabeul}
+    \tdplotmult{\rcbebb}{\rcbrot}{\rbbeul}
+    \tdplotmult{\rccecb}{\rccrot}{\rcbeul}
+    \tdplotmult{\rcaeac}{\rcarot}{\raceul}
+    \tdplotmult{\rcbebc}{\rcbrot}{\rbceul}
+    \tdplotmult{\rccecc}{\rccrot}{\rcceul}
+    % see the source code tikz-3dplot.sty line 332-335
+    \pgfmathsetmacro{\rcarc}{\rcaeaa+\rcbeba+\rcceca}
+    \pgfmathsetmacro{\rcbrc}{\rcaeab+\rcbebb+\rccecb}
+    \pgfmathsetmacro{\rccrc}{\rcaeac+\rcbebc+\rccecc}
+    % repair \tikzset
+    \def\tikzset{\pgfqkeys{/tikz}}
+    \tikzset{Rotated/.style={x={(\raarc cm,\rbarc cm)},y={(\rabrc cm, \rbbrc cm)},z={(\racrc cm, \rbcrc cm)}}}%
+}
+
+% define a further-rotate version of \tdplotsetrotatedcoords
+% \furtherRotate means that the rotation can be accumulated.
+\def\furtherRotate#1#2#3{
+    % before everything, deceive tikz-3dplot by letting main-coordinate to be rotated coordinate
+    % in other words:
+    %    \let\oldMain=\Main
+    %    \let\Main=\Rotated
+    %    \tdplotsetrotatedcoords{...}
+    %    \let\Main=\oldMain
+    \let\oldraarot\raarot\let\oldrabrot\rabrot\let\oldracrot\racrot
+    \let\oldrbarot\rbarot\let\oldrbbrot\rbbrot\let\oldrbcrot\rbcrot
+    \let\oldrcarot\rcarot\let\oldrcbrot\rcbrot\let\oldrccrot\rccrot
+    \let\raarot\raarc    \let\rabrot\rabrc    \let\racrot\racrc
+    \let\rbarot\rbarc    \let\rbbrot\rbbrc    \let\rbcrot\rbcrc
+    \let\rcarot\rcarc    \let\rcbrot\rcbrc    \let\rccrot\rccrc
+    %
+    %
+    % the following is like \tdplotsetrotatedcoords
+    %
+    %
+    \reRotate{#1}{#2}{#3}
+    %
+    %
+    % do not forget the \let\M=\oldM part
+    %
+    %
+    \let\raarot\oldraarot\let\rabrot\oldrabrot\let\racrot\oldracrot
+    \let\rbarot\oldrbarot\let\rbbrot\oldrbbrot\let\rbcrot\oldrbcrot
+    \let\rcarot\oldrcarot\let\rcbrot\oldrcbrot\let\rccrot\oldrccrot
+}
+
+\def\Shift#1#2#3{
+    \tikzset{Rotated}
+    \pgfpointxyz{#1}{#2}{#3}
+    \edef\temp@shift@vector{\noexpand\pgf@x\the\pgf@x\noexpand\pgf@y\the\pgf@y}
+    \pgftransformshift{\temp@shift@vector}
+}
+
+\frame{
+    $$
+        \tikz[shorten >=.5em]{
+            \setMain{70}{110}
+            \draw[Main,thick,->](0,0,0)--(5,0,0)node{$X$};
+            \draw[Main,thick,->](0,0,0)--(0,5,0)node{$Y$};
+            \draw[Main,thick,->](0,0,0)--(0,0,5)node{$Z$};
+            \only<+->{\reRotate{0}{0}{0}}
+            \only<+->{\Shift{-1}{0}{0}}
+            \only<+->{\Shift{-1}{0}{0}}
+            \only<+->{\Shift{-1}{0}{0}}
+            \only<+->{\furtherRotate{30}{0}{0}}
+            \only<+->{\furtherRotate{30}{0}{0}}
+            \only<+->{\furtherRotate{30}{0}{0}}
+            \only<+->{\Shift{1}{0}{0}}
+            \only<+->{\Shift{1}{0}{0}}
+            \only<+->{\Shift{1}{0}{0}}
+            \only<+->{\furtherRotate{0}{30}{0}}
+            \only<+->{\furtherRotate{0}{30}{0}}
+            \only<+->{\furtherRotate{0}{30}{0}}
+            \only<+->{\Shift{-1}{0}{0}}
+            \only<+->{\Shift{-1}{0}{0}}
+            \only<+->{\Shift{-1}{0}{0}}
+            \draw[Rotated,->](0,0,0)--(1,0,0)node{$x$};
+            \draw[Rotated,->](0,0,0)--(0,1,0)node{$y$};
+            \draw[Rotated,->](0,0,0)--(0,0,1)node{$z$};
+        }
+    $$
+}
+
+\end{document}

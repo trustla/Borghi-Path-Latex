@@ -1,0 +1,218 @@
+\documentclass{article}
+\usepackage{tikz,tikz-3dplot}
+\usepackage{pgfplots}
+
+\usetikzlibrary{shapes}
+
+\begin{document}
+\makeatletter
+
+\tikzoption{canvas is plane}[]{\@setOxy#1}
+\def\@setOxy O(#1,#2,#3)x(#4,#5,#6)y(#7,#8,#9)%
+  {\def\tikz@plane@origin{\pgfpointxyz{#1}{#2}{#3}}%
+   \def\tikz@plane@x{\pgfpointxyz{#4}{#5}{#6}}%
+   \def\tikz@plane@y{\pgfpointxyz{#7}{#8}{#9}}%
+   \tikz@canvas@is@plane
+  }
+
+% enhance \tdplotsetmaincoords
+\def\setMain#1#2{
+    % disable \tikzset
+    \let\tikzset\pgfutil@gobble
+    % \tikzset is used here
+    \tdplotsetmaincoords{#1}{#2}
+    % repair \tikzset
+    \def\tikzset{\pgfqkeys{/tikz}}
+    \tikzset{Main/.style={x={(\raarot cm,\rbarot cm)},y={(\rabrot cm, \rbbrot cm)},z={(\racrot cm, \rbcrot cm)}}}
+    % also setup Rotated coordinate
+    \reRotate{0}{0}{0}
+}
+
+% enhance \tdplotsetrotatedcoords by appending the commented lines
+% \resRotated means that the rotation is not accumulated.
+\def\reRotate#1#2#3{
+    % disable \tikzset
+    \let\tikzset\pgfutil@gobble
+    % \tikzset is used here
+    \tdplotsetrotatedcoords{#1}{#2}{#3}
+    % append the commented lines
+    % see the source code tikz-3dplot.sty line 312-323
+    \tdplotmult{\rcaeaa}{\rcarot}{\raaeul}
+    \tdplotmult{\rcbeba}{\rcbrot}{\rbaeul}
+    \tdplotmult{\rcceca}{\rccrot}{\rcaeul}
+    \tdplotmult{\rcaeab}{\rcarot}{\rabeul}
+    \tdplotmult{\rcbebb}{\rcbrot}{\rbbeul}
+    \tdplotmult{\rccecb}{\rccrot}{\rcbeul}
+    \tdplotmult{\rcaeac}{\rcarot}{\raceul}
+    \tdplotmult{\rcbebc}{\rcbrot}{\rbceul}
+    \tdplotmult{\rccecc}{\rccrot}{\rcceul}
+    % see the source code tikz-3dplot.sty line 332-335
+    \pgfmathsetmacro{\rcarc}{\rcaeaa+\rcbeba+\rcceca}
+    \pgfmathsetmacro{\rcbrc}{\rcaeab+\rcbebb+\rccecb}
+    \pgfmathsetmacro{\rccrc}{\rcaeac+\rcbebc+\rccecc}
+    % repair \tikzset
+    \def\tikzset{\pgfqkeys{/tikz}}
+    \tikzset{Rotated/.style={x={(\raarc cm,\rbarc cm)},y={(\rabrc cm, \rbbrc cm)},z={(\racrc cm, \rbcrc cm)}}}%
+}
+
+% define a further-rotate version of \tdplotsetrotatedcoords
+% \furtherRotate means that the rotation can be accumulated.
+\def\furtherRotate#1#2#3{
+    % before everything, deceive tikz-3dplot by letting main-coordinate to be rotated coordinate
+    % in other words:
+    %    \let\oldMain=\Main
+    %    \let\Main=\Rotated
+    %    \tdplotsetrotatedcoords{...}
+    %    \let\Main=\oldMain
+    \let\oldraarot\raarot\let\oldrabrot\rabrot\let\oldracrot\racrot
+    \let\oldrbarot\rbarot\let\oldrbbrot\rbbrot\let\oldrbcrot\rbcrot
+    \let\oldrcarot\rcarot\let\oldrcbrot\rcbrot\let\oldrccrot\rccrot
+    \let\raarot\raarc    \let\rabrot\rabrc    \let\racrot\racrc
+    \let\rbarot\rbarc    \let\rbbrot\rbbrc    \let\rbcrot\rbcrc
+    \let\rcarot\rcarc    \let\rcbrot\rcbrc    \let\rccrot\rccrc
+    %
+    %
+    % the following is like \tdplotsetrotatedcoords
+    %
+    %
+    \reRotate{#1}{#2}{#3}
+    %
+    %
+    % do not forget the \let\M=\oldM part
+    %
+    %
+    \let\raarot\oldraarot\let\rabrot\oldrabrot\let\racrot\oldracrot
+    \let\rbarot\oldrbarot\let\rbbrot\oldrbbrot\let\rbcrot\oldrbcrot
+    \let\rcarot\oldrcarot\let\rcbrot\oldrcbrot\let\rccrot\oldrccrot
+}
+
+\def\Shift#1#2#3{
+    \tikzset{Rotated}
+    \pgfpointxyz{#1}{#2}{#3}
+    \edef\temp@shift@vector{\noexpand\pgf@x\the\pgf@x\noexpand\pgf@y\the\pgf@y}
+    \pgftransformshift{\temp@shift@vector}
+}
+
+\makeatother 
+
+\begin{figure}
+\centering
+\tdplotsetmaincoords{0}{0}
+\newcommand{\radius}{2}
+\newcommand{\tuftRadius}{0.2}
+\newcommand{\length}{5}
+\newcommand{\tuftLength}{2}
+\newcommand{\xTest}{2.5}
+\newcommand{\phiTest}{45}
+\newcommand{\alphaTest}{15}
+\newcommand{\betaTest}{-15}
+
+
+
+\begin{tikzpicture}[tdplot_main_coords]
+
+    % \tdplotsetrotatedcoords{-150}{20}{150}
+    \tdplotsetrotatedcoords{0}{0}{0}
+    \reRotate{-150}{20}{150}
+    \begin{scope}[tdplot_rotated_coords]
+        \tikzstyle{every node}=[font=\small]
+        \draw[thick,-latex] (0,0,0) -- (7,0,0) node[anchor=north east]{$x$};
+        \draw[thick,-latex] (0,0,0) -- (0,5,0) node[anchor=north west]{$y$};
+        \draw[thick,-latex] (0,0,0) -- (0,0,10) node[anchor=north east]{$z$};
+        \tikzset{zxplane/.style={canvas is zx plane at y=#1,very thin}}
+        \tikzset{yxplane/.style={canvas is yx plane at z=#1,very thin}}
+        \begin{scope} [canvas is plane={O(0,0,0)x(0,1,0)y(0,0,1)}]
+            \draw [thick](0,0) circle ({\radius});
+        \end{scope}
+        \begin{scope} [canvas is plane={O({\length},0,0)x({\length},1,0)y({\length},0,1)}]
+            \draw [thick](0,0) circle ({\radius});
+        \end{scope}
+
+        \draw [thick](0,{\radius},0) -- ({\length},{\radius},0);
+        \draw [thick](0,-{\radius},0) -- ({\length},-{\radius},0);
+
+        \begin{scope} [canvas is plane={O({\xTest},0,0)x({\xTest},1,0)y({\xTest},0,1)}]
+            \draw [thick,dotted](0,0) circle ({\radius});
+        \end{scope}
+
+
+        
+        \filldraw[fill=orange, nearly transparent, dotted] ({\xTest},-7, 7) -- ({\xTest},7,7) --  ({\xTest},7,-7) -- ({\xTest},-7,-7) -- ({\xTest},-7,7);
+        % \filldraw[fill=blue, nearly transparent] (0,0,4) -- (5.2,6,4) --  (5.2,6,0) -- (0,0,0) -- (0,0,4);
+        % \filldraw [color=blue](2,2.25,4) circle (0.075cm) ;
+
+        \draw (5,6,0) node[anchor=south west]{$x = X_{tuft}$ plane};
+
+        \draw [thick,dotted, -latex]({\xTest},0,0) -- ({\xTest},0,10) node[anchor=north east]{$z'$};
+
+        \draw [thick,dotted]({\xTest},0,0) -- ({\xTest},{7 * sin(\phiTest)},{7 * cos(\phiTest)});
+
+        \draw[very thick, -latex, red] (0,0,0) -- ({\xTest},0,0) node[midway, below]{$X_{tuft}$};
+
+        \draw[very thick, -latex, green] ({\xTest},0,0) -- ({\xTest},{\radius * sin(\phiTest)},{\radius * cos(\phiTest)}) node[pos = 0.3, right]{$R_{tuft}$};
+        
+        % \node at (1.8,1,4)  { $P_1(r_1,\phi_1,z_1)$};
+        % \draw[ultra thick,-latex](2,2.25,4) -- (3,3.45,4) node[anchor=north] {$\mathbf{a}_r$};
+        % \draw[ultra thick,-latex](2,2.25,4) -- (1,2.5,4) node[anchor=north west] {$\mathbf{a}_\phi$};
+        % \draw[ultra thick,-latex](2,2.25,4) -- (2,2.25,4.75) node[anchor=north west] {$\mathbf{a}_z$};
+        % \draw [thick,->](4,0,0) arc (0:45:4 and 4.5);
+        % \draw (3.6,2,0) node[anchor=north] {$\phi_1$};
+        % \draw[ultra thick,-latex](0,0,0) -- (2,2.35,0);
+        % \draw (1,1,0) node[anchor=north] {$r_1$};
+        % \draw [ultra thick] (2,2.25,4)--(1.95,2.25,0);
+
+        % \draw[ultra thick](0.1,0,4) -- (-0.1,0,4) node[anchor=south west] {$z_1$};
+
+    \end{scope}       
+
+    \furtherRotate{0}{90}{0}
+    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, blue]{(0,0,{\xTest})}{5}{-180}{180 - \phiTest}{anchor=west}{$\phi_{tuft}$};
+    \furtherRotate{0}{-90}{0}
+
+    \furtherRotate{90}{\phiTest}{-90}
+    \Shift{\xTest}{0}{\radius}
+
+    \furtherRotate{0}{90}{0}
+    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-180}{\alphaTest - 180}{anchor= west}{$\alpha_{tuft}$};
+    \furtherRotate{0}{-90}{0}
+
+    \furtherRotate{90}{-\alphaTest}{-90}
+
+    \begin{scope}[tdplot_rotated_coords]
+        \draw [thick, dotted](0,0,0) -- (0,0,6.5);        
+    \end{scope}
+
+    \furtherRotate{90}{-90}{-90}
+    \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 - \betaTest}{anchor=south}{$\beta_{tuft}$};
+    \furtherRotate{-90}{-90}{90}
+
+
+
+
+    \furtherRotate{0}{\betaTest}{0}
+
+
+    \begin{scope}[tdplot_rotated_coords]
+        % \begin{scope} [canvas is plane={O({\xTest},{sin(\phiTest)},{cos(\phiTest)})x({1+\xTest},{sin(\phiTest)},{cos(\phiTest)})y({\xTest},{sin(\phiTest) + 1},{cos(\phiTest)})}]
+        % \begin{scope} [canvas is plane={O(0,0,0)x(1,0,0)y(0,1,0)}]
+        %     \draw [thick](0,0) circle ({\tuftRadius});
+        % \end{scope}
+        % \begin{scope} [canvas is plane={O(0,0,{\tuftLength})x(1,0,{\tuftLength})y(0,1,{\tuftLength})}]
+        %     \draw [thick](0,0) circle ({\tuftRadius});
+        % \end{scope}
+
+        \newcommand{\n}{11}
+        \newcommand{\h}{\tuftLength}
+        \newcommand{\rl}{\tuftRadius}
+        \newcommand{\rh}{\tuftRadius}
+        % \path[draw,fill=white] plot[domain=0:2*pi,samples=4*\n] ({\rl*cos(\x r)}, {\rl*sin(\x r)}, 0);
+        \foreach \t in {1,...,22} {
+            \filldraw[fill=white] ({\rl*cos(\t*pi/\n r)},{\rl*sin(\t*pi/\n r)},0) -- ({\rl*cos((\t+1)*pi/\n r)},{\rl*sin((\t+1)*pi/\n r)},0) -- ({\rh*cos((\t+1)*pi/\n r)},{\rh*sin((\t+1)*pi/\n r)},\h) -- ({\rh*cos(\t*pi/\n r)},{\rh*sin(\t*pi/\n r)},\h) -- cycle;
+        }
+        % \path[draw,fill=white] plot[domain=0:2*pi,samples=4*\n] ({\rh*cos(\x r)}, {\rh*sin(\x r)}, \h);
+        \draw [thick, -latex](0,0,0) -- (0,0,{\tuftLength + 2});
+
+    \end{scope}
+\end{tikzpicture}
+\end{figure}
+\end{document}
