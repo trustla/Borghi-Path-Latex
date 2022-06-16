@@ -103,14 +103,13 @@
 \newcommand{\length}{5}
 \newcommand{\tuftLength}{2}
 \newcommand{\xTest}{2.5}
-\newcommand{\zTest}{2.5}
 \newcommand{\phiTest}{45}
 \newcommand{\alphaTest}{15}
-\newcommand{\betaTest}{-15}
+\newcommand{\betaTest}{0}
 
 
 
-\begin{tikzpicture}[tdplot_main_coords]
+\begin{tikzpicture}[tdplot_main_coords] 
 
     % \tdplotsetrotatedcoords{-150}{20}{150}
     \tdplotsetrotatedcoords{0}{0}{0}
@@ -122,7 +121,7 @@
         \draw[thick,-latex] (0,0,0) -- (0,0,10) node[anchor=north east]{$z$};
         \tikzset{zxplane/.style={canvas is zx plane at y=#1,very thin}}
         \tikzset{yxplane/.style={canvas is yx plane at z=#1,very thin}}
-        \begin{scope} [canvas is plane={O(0,0,0)x(1,0,0)y(0,1,0)}]
+        \begin{scope} [canvas is plane={O(0,0,0)x(0,1,0)y(0,0,1)}]
             \draw [thick](0,0) circle ({\radius});
         \end{scope}
         \begin{scope} [canvas is plane={O({\length},0,0)x({\length},1,0)y({\length},0,1)}]
@@ -138,19 +137,19 @@
 
 
         
-        \filldraw[fill=orange, nearly transparent, dotted] ({\xTest},-5, 5) -- ({\xTest},5,5) --  ({\xTest},5,-5) -- ({\xTest},-5,-5) -- ({\xTest},-5,5);
+        \filldraw[fill=orange, nearly transparent, dotted] ({\xTest},-7, 7) -- ({\xTest},7,7) --  ({\xTest},7,-7) -- ({\xTest},-7,-7) -- ({\xTest},-7,7);
         % \filldraw[fill=blue, nearly transparent] (0,0,4) -- (5.2,6,4) --  (5.2,6,0) -- (0,0,0) -- (0,0,4);
         % \filldraw [color=blue](2,2.25,4) circle (0.075cm) ;
 
-        \draw (4,6,0) node[anchor=south west]{$x = X_{tuft}$ plane};
+        \draw (5,6,0) node[anchor=south west]{$x = X_{tuft}$ plane};
 
         \draw [thick,dotted, -latex]({\xTest},0,0) -- ({\xTest},0,10) node[anchor=north east]{$z'$};
 
-        \draw [thick,dotted]({\xTest},0,0) -- ({\xTest},{10 * sin(\phiTest)},{10 * cos(\phiTest)});
+        \draw [thick,dotted]({\xTest},0,0) -- ({\xTest},{7 * sin(\phiTest)},{7 * cos(\phiTest)});
 
-        \draw[very thick, -latex, red] (0,0,0) -- ({\xTest},0,0) node[midway, below]{$X$};
+        \draw[very thick, -latex, red] (0,0,0) -- ({\xTest},0,0) node[midway, below]{$X_{tuft}$};
 
-        \draw[very thick, -latex, green] ({\xTest},0,0) -- ({\xTest},{\radius * sin(\phiTest)},{\radius * cos(\phiTest)}) node[pos = 0.3,above]{$R$};
+        \draw[very thick, -latex, green] ({\xTest},{-\radius * sin(\phiTest)},{-\radius * cos(\phiTest)}) -- ({\xTest},{\radius * sin(\phiTest)},{\radius * cos(\phiTest)}) node[pos = 0.3, above,right]{$D_{tuft}$};
         
         % \node at (1.8,1,4)  { $P_1(r_1,\phi_1,z_1)$};
         % \draw[ultra thick,-latex](2,2.25,4) -- (3,3.45,4) node[anchor=north] {$\mathbf{a}_r$};
@@ -167,24 +166,24 @@
     \end{scope}       
 
     \furtherRotate{0}{90}{0}
-    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, blue]{(0,0,{\xTest})}{5}{-180}{180 - \phiTest}{anchor=west}{$\phi$};
+    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, blue]{(0,0,{\xTest})}{7}{-180}{180 - \phiTest + \alphaTest}{anchor=west}{$\phi_{tuft}$};
     \furtherRotate{0}{-90}{0}
 
     \furtherRotate{90}{\phiTest}{-90}
     \Shift{\xTest}{0}{\radius}
 
     \furtherRotate{0}{90}{0}
-    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-180}{\alphaTest - 180}{anchor= west}{$\alpha$};
+    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-180}{\alphaTest - 180}{anchor= west}{$\alpha_{tuft}$};
     \furtherRotate{0}{-90}{0}
 
     \furtherRotate{90}{-\alphaTest}{-90}
 
     \begin{scope}[tdplot_rotated_coords]
-        \draw [thick, dotted](0,0,0) -- (0,0,10);        
+        \draw [thick, dotted](0,0,0) -- (0,0,6.5);        
     \end{scope}
 
     \furtherRotate{90}{-90}{-90}
-    \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 - \betaTest}{anchor=south}{$\beta$};
+    \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 - \betaTest}{anchor=south}{$\beta_{tuft}$};
     \furtherRotate{-90}{-90}{90}
 
 
