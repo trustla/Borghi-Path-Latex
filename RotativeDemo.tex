@@ -105,7 +105,7 @@
 \newcommand{\xTest}{2.5}
 \newcommand{\phiTest}{45}
 \newcommand{\alphaTest}{15}
-\newcommand{\betaTest}{-15}
+\newcommand{\betaTest}{15}
 
 
 
@@ -137,7 +137,7 @@
 
 
         
-        \filldraw[fill=orange, nearly transparent, dotted] ({\xTest},-7, 7) -- ({\xTest},7,7) --  ({\xTest},7,-7) -- ({\xTest},-7,-7) -- ({\xTest},-7,7);
+        \filldraw[fill=orange, nearly transparent, dotted] ({\xTest},-6, 7) -- ({\xTest},6,7) --  ({\xTest},6,-7) -- ({\xTest},-6,-7) -- ({\xTest},-6,7);
         % \filldraw[fill=blue, nearly transparent] (0,0,4) -- (5.2,6,4) --  (5.2,6,0) -- (0,0,0) -- (0,0,4);
         % \filldraw [color=blue](2,2.25,4) circle (0.075cm) ;
 
@@ -173,17 +173,22 @@
     \Shift{\xTest}{0}{\radius}
 
     \furtherRotate{0}{90}{0}
-    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-180}{\alphaTest - 180}{anchor= west}{$\alpha_{tuft}$};
+    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-180}{\alphaTest - 180}{anchor= east}{$\alpha_{tuft}$};
     \furtherRotate{0}{-90}{0}
 
     \furtherRotate{90}{-\alphaTest}{-90}
 
     \begin{scope}[tdplot_rotated_coords]
         \draw [thick, dotted](0,0,0) -- (0,0,6.5);        
+
+        \filldraw[fill=blue, nearly transparent, dotted] (0,0 ,6) -- (3,0,6) --  (3,0,{-(\radius * sin(\phiTest)/(sin(\phiTest - \alphaTest)))}) -- (0, 0,{-(\radius * sin(\phiTest)/(sin(\phiTest - \alphaTest)))}) -- (0, 0,6);
+
+        \draw (4.5,0,0) node[anchor=south west]{$\alpha = \alpha_{tuft}$ plane, shifted by distance of $W_{tuft}$};
+        \draw (4.5,-0.5,0) node[anchor=south west]{$\beta$ angle rotation plane};
     \end{scope}
 
     \furtherRotate{90}{-90}{-90}
-    \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 - \betaTest}{anchor=south}{$\beta_{tuft}$};
+    \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 - \betaTest}{anchor=north east }{$\beta_{tuft}$};
     \furtherRotate{-90}{-90}{90}
 
 

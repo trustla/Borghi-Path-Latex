@@ -2,8 +2,6 @@
 \usepackage{tikz,tikz-3dplot}
 \usepackage{pgfplots}
 
-\usepackage{tkz-euclide}
-
 \usetikzlibrary{shapes}
 
 \begin{document}
@@ -104,14 +102,18 @@
 \newcommand{\tuftRadius}{0.2}
 \newcommand{\length}{5}
 \newcommand{\tuftLength}{2}
-\newcommand{\xTest}{2.5}
+\newcommand{\xTest}{3}
+\newcommand{\yTest}{2.5}
+\newcommand{\zTest}{2}
+
+
 \newcommand{\phiTest}{45}
-\newcommand{\alphaTest}{30}
-\newcommand{\betaTest}{30}
+\newcommand{\alphaTest}{15}
+\newcommand{\betaTest}{-20}
 
 
 
-\begin{tikzpicture}[tdplot_main_coords] 
+\begin{tikzpicture}[tdplot_main_coords]
 
     % \tdplotsetrotatedcoords{-150}{20}{150}
     \tdplotsetrotatedcoords{0}{0}{0}
@@ -123,100 +125,61 @@
         \draw[thick,-latex] (0,0,0) -- (0,0,10) node[anchor=north east]{$z$};
         \tikzset{zxplane/.style={canvas is zx plane at y=#1,very thin}}
         \tikzset{yxplane/.style={canvas is yx plane at z=#1,very thin}}
-        \begin{scope} [canvas is plane={O(0,0,0)x(0,1,0)y(0,0,1)}]
-            \draw [thick](0,0) circle ({\radius});
-        \end{scope}
-        \begin{scope} [canvas is plane={O({\length},0,0)x({\length},1,0)y({\length},0,1)}]
-            \draw [thick](0,0) circle ({\radius});
-        \end{scope}
-
-        \draw [thick](0,{\radius},0) -- ({\length},{\radius},0);
-        \draw [thick](0,-{\radius},0) -- ({\length},-{\radius},0);
-
-        \begin{scope} [canvas is plane={O({\xTest},0,0)x({\xTest},1,0)y({\xTest},0,1)}]
-            \draw [thick,dotted](0,0) circle ({\radius});
-        \end{scope}
-
 
         
-        \filldraw[fill=orange, nearly transparent, dotted] ({\xTest},-3, 7) -- ({\xTest},6,7) --  ({\xTest},6,-7) -- ({\xTest},-3,-7) -- ({\xTest},-3,7);
-        % \filldraw[fill=blue, nearly transparent] (0,0,4) -- (5.2,6,4) --  (5.2,6,0) -- (0,0,0) -- (0,0,4);
-        % \filldraw [color=blue](2,2.25,4) circle (0.075cm) ;
+        \filldraw[fill=orange, nearly transparent, dotted] ({\xTest},-2, 7) -- ({\xTest},6,7) --  ({\xTest},6,-7) -- ({\xTest},-2,-7) -- ({\xTest},-2,7);
+        \draw (5.5,6,0) node[anchor=south west]{$x = X_{tuft}$ plane};
+        \draw (5.5,5.5,0) node[anchor=south west]{$\alpha$ angle rotation plane};
 
-        \draw (5,7,0) node[anchor=south west]{$x = X_{tuft}$ plane};
-        \draw (5,6.5,0) node[anchor=south west]{$\alpha$ angle rotation plane};
+        \draw[very thick, -latex, red] (0,0,0) -- ({\xTest},0,0) node[midway, below]{$X_{tuft}$};
 
+        \draw[very thick, -latex, green] ({\xTest},0,0) -- ({\xTest},{\yTest},0) node[midway, right]{$Y_{tuft}$};
 
-        \draw [thick,dotted, -latex]({\xTest},0,-10) -- ({\xTest},0,10) node[anchor=north east]{$z'$};
+        \draw[very thick, -latex, blue] ({\xTest},{\yTest},0) -- ({\xTest},{\yTest},{\zTest}) node[midway, above]{$Z_{tuft}$};
 
-
-        \draw[very thick, -latex, red] (0,0,0) -- ({\xTest},0,0) node[pos=0.3, below]{$X_{tuft}$};
-
-        \draw[very thick, -latex, green] ({\xTest},{-\radius * sin(\phiTest)},{-\radius * cos(\phiTest)}) -- ({\xTest},{\radius * sin(\phiTest)},{\radius * cos(\phiTest)}) node[pos = 0.3, above,right]{$D_{tuft}$};      
+        \draw [thick,dotted]({\xTest},{\yTest},{\zTest-5}) -- ({\xTest},{\yTest},{\zTest+5}) ;       
 
     \end{scope}       
 
-    % \furtherRotate{0}{90}{0}
-    % \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, blue]{(0,0,{\xTest})}{7}{-180}{180 - \phiTest + \alphaTest}{anchor=west}{$\phi_{tuft}$};
-    % \furtherRotate{0}{-90}{0}
+    \Shift{\xTest}{\yTest}{\zTest}
 
-    \furtherRotate{90}{\phiTest}{-90}
-    \Shift{\xTest}{0}{\radius}
-
-
+    \furtherRotate{0}{90}{0}
+    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{180}{180 +\alphaTest }{anchor = east}{$\alpha_{tuft}$};
+    \furtherRotate{0}{-90}{0}
 
     \furtherRotate{90}{-\alphaTest}{-90}
 
     \begin{scope}[tdplot_rotated_coords]
-        \draw [thick, dotted](0,0,-6.5) -- (0,0,6.5);   
-        \node at (0,0,{-(\radius * sin(\phiTest)/(sin(\phiTest - \alphaTest)))}) [circle,fill,inner sep=1.5pt]{}; 
-        \node at (0,0,{-(\radius *(cos(\alphaTest)))}) [circle,fill,inner sep=1.5pt]{}; 
+        \draw [thick, dotted](0,0,-5) -- (0,0,5);       
+        
+        \filldraw[fill=blue, nearly transparent, dotted] (0,0 ,4.5) -- (3,0,4.5) --  (3,0,-4.5) -- (0, 0,-4.5) -- (0, 0,4.5);
 
-        \begin{scope} [canvas is plane={O(0,0,{-(\radius *(cos(\alphaTest)))})x(0,1,{-(\radius *(cos(\alphaTest)))})y(0,0,{1-(\radius *(cos(\alphaTest)))})}]
-            \fill [opacity=0.7,yellow,draw=black] (0,0) rectangle (-0.4,0.4);
-        \end{scope}
-
-        \draw[very thick, -latex, blue]  (0,{-\radius * sin(\alphaTest)},{-(\radius *(cos(\alphaTest)))}) -- (0,0,{-(\radius *(cos(\alphaTest)))})node[midway, right]{$W_{tuft}$};
-            
-        \filldraw[fill=blue, nearly transparent, dotted] (0,0 ,6) -- (3,0,6) --  (3,0,{-(\radius * sin(\phiTest)/(sin(\phiTest - \alphaTest)))}) -- (0, 0,{-(\radius * sin(\phiTest)/(sin(\phiTest - \alphaTest)))}) -- (0, 0,6);
-
-        \draw (4.5,0,0) node[anchor=south west]{$\alpha = \alpha_{tuft}$ plane, shifted by distance of $W_{tuft}$};
-        \draw (4.5,-0.5,0) node[anchor=south west]{$\beta$ angle rotation plane};
+        \draw (3.5,0,0) node[anchor=south west]{$\alpha = \alpha_{tuft}$ plane, passing tuft position};
+        \draw (3.5,-0.5,0) node[anchor=south west]{$\beta$ angle rotation plane};
 
     \end{scope}
 
-    \furtherRotate{0}{90}{0}
-    \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex]{({(\radius * sin(\phiTest)/(sin(\phiTest - \alphaTest)))},0,0)}{8}{-180 + \phiTest - \alphaTest}{-180}{anchor=west}{$\alpha_{tuft}$};
-    \furtherRotate{0}{-90}{0}
-
     \furtherRotate{90}{-90}{-90}
-    \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 - \betaTest}{anchor=south}{$\beta_{tuft}$};
+    \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 + \betaTest}{anchor=north }{$\beta_{tuft}$};
     \furtherRotate{-90}{-90}{90}
 
 
 
 
-    \furtherRotate{0}{\betaTest}{0}
+    \furtherRotate{0}{-\betaTest}{0}
 
 
     \begin{scope}[tdplot_rotated_coords]
-        % \begin{scope} [canvas is plane={O({\xTest},{sin(\phiTest)},{cos(\phiTest)})x({1+\xTest},{sin(\phiTest)},{cos(\phiTest)})y({\xTest},{sin(\phiTest) + 1},{cos(\phiTest)})}]
-        % \begin{scope} [canvas is plane={O(0,0,0)x(1,0,0)y(0,1,0)}]
-        %     \draw [thick](0,0) circle ({\tuftRadius});
-        % \end{scope}
-        % \begin{scope} [canvas is plane={O(0,0,{\tuftLength})x(1,0,{\tuftLength})y(0,1,{\tuftLength})}]
-        %     \draw [thick](0,0) circle ({\tuftRadius});
-        % \end{scope}
 
         \newcommand{\n}{11}
         \newcommand{\h}{\tuftLength}
         \newcommand{\rl}{\tuftRadius}
         \newcommand{\rh}{\tuftRadius}
-        % \path[draw,fill=white] plot[domain=0:2*pi,samples=4*\n] ({\rl*cos(\x r)}, {\rl*sin(\x r)}, 0);
+
         \foreach \t in {1,...,22} {
             \filldraw[fill=white] ({\rl*cos(\t*pi/\n r)},{\rl*sin(\t*pi/\n r)},0) -- ({\rl*cos((\t+1)*pi/\n r)},{\rl*sin((\t+1)*pi/\n r)},0) -- ({\rh*cos((\t+1)*pi/\n r)},{\rh*sin((\t+1)*pi/\n r)},\h) -- ({\rh*cos(\t*pi/\n r)},{\rh*sin(\t*pi/\n r)},\h) -- cycle;
         }
-        % \path[draw,fill=white] plot[domain=0:2*pi,samples=4*\n] ({\rh*cos(\x r)}, {\rh*sin(\x r)}, \h);
+
         \draw [thick, -latex](0,0,0) -- (0,0,{\tuftLength + 2});
 
     \end{scope}
