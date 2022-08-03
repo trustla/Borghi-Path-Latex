@@ -1,0 +1,275 @@
+\documentclass{article}
+\usepackage{tikz,tikz-3dplot}
+\usepackage{pgfplots}
+\usepackage[margin=2cm,landscape]{geometry}
+
+\usetikzlibrary{shapes}
+
+\begin{document}
+\makeatletter
+
+\tikzoption{canvas is plane}[]{\@setOxy#1}
+\def\@setOxy O(#1,#2,#3)x(#4,#5,#6)y(#7,#8,#9)%
+  {\def\tikz@plane@origin{\pgfpointxyz{#1}{#2}{#3}}%
+   \def\tikz@plane@x{\pgfpointxyz{#4}{#5}{#6}}%
+   \def\tikz@plane@y{\pgfpointxyz{#7}{#8}{#9}}%
+   \tikz@canvas@is@plane
+  }
+
+% enhance \tdplotsetmaincoords
+\def\setMain#1#2{
+    % disable \tikzset
+    \let\tikzset\pgfutil@gobble
+    % \tikzset is used here
+    \tdplotsetmaincoords{#1}{#2}
+    % repair \tikzset
+    \def\tikzset{\pgfqkeys{/tikz}}
+    \tikzset{Main/.style={x={(\raarot cm,\rbarot cm)},y={(\rabrot cm, \rbbrot cm)},z={(\racrot cm, \rbcrot cm)}}}
+    % also setup Rotated coordinate
+    \reRotate{0}{0}{0}
+}
+
+% enhance \tdplotsetrotatedcoords by appending the commented lines
+% \resRotated means that the rotation is not accumulated.
+\def\reRotate#1#2#3{
+    % disable \tikzset
+    \let\tikzset\pgfutil@gobble
+    % \tikzset is used here
+    \tdplotsetrotatedcoords{#1}{#2}{#3}
+    % append the commented lines
+    % see the source code tikz-3dplot.sty line 312-323
+    \tdplotmult{\rcaeaa}{\rcarot}{\raaeul}
+    \tdplotmult{\rcbeba}{\rcbrot}{\rbaeul}
+    \tdplotmult{\rcceca}{\rccrot}{\rcaeul}
+    \tdplotmult{\rcaeab}{\rcarot}{\rabeul}
+    \tdplotmult{\rcbebb}{\rcbrot}{\rbbeul}
+    \tdplotmult{\rccecb}{\rccrot}{\rcbeul}
+    \tdplotmult{\rcaeac}{\rcarot}{\raceul}
+    \tdplotmult{\rcbebc}{\rcbrot}{\rbceul}
+    \tdplotmult{\rccecc}{\rccrot}{\rcceul}
+    % see the source code tikz-3dplot.sty line 332-335
+    \pgfmathsetmacro{\rcarc}{\rcaeaa+\rcbeba+\rcceca}
+    \pgfmathsetmacro{\rcbrc}{\rcaeab+\rcbebb+\rccecb}
+    \pgfmathsetmacro{\rccrc}{\rcaeac+\rcbebc+\rccecc}
+    % repair \tikzset
+    \def\tikzset{\pgfqkeys{/tikz}}
+    \tikzset{Rotated/.style={x={(\raarc cm,\rbarc cm)},y={(\rabrc cm, \rbbrc cm)},z={(\racrc cm, \rbcrc cm)}}}%
+}
+
+% define a further-rotate version of \tdplotsetrotatedcoords
+% \furtherRotate means that the rotation can be accumulated.
+\def\furtherRotate#1#2#3{
+    % before everything, deceive tikz-3dplot by letting main-coordinate to be rotated coordinate
+    % in other words:
+    %    \let\oldMain=\Main
+    %    \let\Main=\Rotated
+    %    \tdplotsetrotatedcoords{...}
+    %    \let\Main=\oldMain
+    \let\oldraarot\raarot\let\oldrabrot\rabrot\let\oldracrot\racrot
+    \let\oldrbarot\rbarot\let\oldrbbrot\rbbrot\let\oldrbcrot\rbcrot
+    \let\oldrcarot\rcarot\let\oldrcbrot\rcbrot\let\oldrccrot\rccrot
+    \let\raarot\raarc    \let\rabrot\rabrc    \let\racrot\racrc
+    \let\rbarot\rbarc    \let\rbbrot\rbbrc    \let\rbcrot\rbcrc
+    \let\rcarot\rcarc    \let\rcbrot\rcbrc    \let\rccrot\rccrc
+    %
+    %
+    % the following is like \tdplotsetrotatedcoords
+    %
+    %
+    \reRotate{#1}{#2}{#3}
+    %
+    %
+    % do not forget the \let\M=\oldM part
+    %
+    %
+    \let\raarot\oldraarot\let\rabrot\oldrabrot\let\racrot\oldracrot
+    \let\rbarot\oldrbarot\let\rbbrot\oldrbbrot\let\rbcrot\oldrbcrot
+    \let\rcarot\oldrcarot\let\rcbrot\oldrcbrot\let\rccrot\oldrccrot
+}
+
+\def\Shift#1#2#3{
+    \tikzset{Rotated}
+    \pgfpointxyz{#1}{#2}{#3}
+    \edef\temp@shift@vector{\noexpand\pgf@x\the\pgf@x\noexpand\pgf@y\the\pgf@y}
+    \pgftransformshift{\temp@shift@vector}
+}
+
+\makeatother 
+
+\begin{figure}
+\centering
+\tdplotsetmaincoords{0}{0}
+\newcommand{\radius}{5}
+\newcommand{\tuftRadius}{0.2}
+\newcommand{\height}{1}
+\newcommand{\tuftLength}{2}
+\newcommand{\xTest}{2.5}
+\newcommand{\zTest}{2.5}
+\newcommand{\phiTest}{45}
+\newcommand{\RTest}{3}
+\newcommand{\thetaTest}{30}
+\newcommand{\alphaTest}{45}
+\newcommand{\betaTest}{30}
+
+
+
+\begin{tikzpicture}[tdplot_main_coords]
+
+    % \tdplotsetrotatedcoords{-150}{20}{150}
+    \tdplotsetrotatedcoords{0}{0}{0}
+    % ZYZ
+    \reRotate{-90}{-90}{90}
+    \furtherRotate{-90}{25}{50}
+    
+    \begin{scope}[tdplot_rotated_coords]
+        \tikzstyle{every node}=[font=\small]
+        \draw[thick,-latex] (0,0,0) -- (7,0,0) node[anchor=north east]{$x$};
+        \draw[thick,-latex] (0,0,0) -- (0,7,0) node[anchor=north west]{$y$};
+        \draw[thick,-latex] (0,0,0) -- (0,0,5) node[anchor=north east]{$z$};
+
+        \tikzset{zxplane/.style={canvas is zx plane at y=#1,very thin}}
+        \tikzset{yxplane/.style={canvas is yx plane at z=#1,very thin}}
+        \begin{scope} [canvas is plane={O(0,0,0)x(1,0,0)y(0,1,0)}]
+            \draw [thick](0,0) circle ({\radius});
+        \end{scope}
+        \begin{scope} [canvas is plane={O(0,0,{\height})x(1,0,{\height})y(0,1,{\height})}]
+            \draw [thick](0,0) circle ({\radius});
+        \end{scope}
+
+        % cylinder side edges
+        \draw [thick](0,{\radius},0) -- (0,{\radius},{\height});
+        \draw [thick](0,-{\radius},0) -- (0,-{\radius},{\height});        
+        \draw [thick]({\radius},0,0) -- ({\radius},0,{\height});
+        \draw [thick](-{\radius},0,0) -- (-{\radius},0,{\height});
+
+        % % R test circle
+        % \begin{scope} [canvas is plane={O(0,0,{\height})x(1,0,{\height})y(0,1,{\height})}]
+        %     \draw [thick,dotted](0,0) circle ({\RTest});
+        % \end{scope}
+        
+        % z = Ztuft plane
+        \filldraw[fill=orange, nearly transparent, dotted] (5,-5, {\height}) -- (5,5,{\height}) --  (-5,5,{\height}) -- (-5,-5,{\height}) -- (5,-5,{\height});
+        \draw (5,5,{\height}) node[anchor=south west]{$z = Z_{tuft}$ plane};
+
+
+        % Three position coordinates
+        \draw[very thick, -latex, red] (0,0,{\height}) -- ({\RTest * cos(\thetaTest)},{\RTest * sin(\thetaTest)},{\height}) node[midway, below]{$R$};
+
+        \tdplotdrawarc[very thick, -latex, green]{(0,0,{\height})}{\RTest}{0}{\thetaTest}{anchor=west}{$\theta$};
+
+        \draw[very thick, -latex, blue] (0,0,0) -- (0,0,{\height}) node[midway,right]{$Z$};
+
+        \draw [thick,dotted, -latex](0,0,{\height}) -- (5,0,{\height}) node[anchor= south east]{$x'$};
+
+
+        
+        % \node at (1.8,1,4)  { $P_1(r_1,\phi_1,z_1)$};
+        % \draw[ultra thick,-latex](2,2.25,4) -- (3,3.45,4) node[anchor=north] {$\mathbf{a}_r$};
+        % \draw[ultra thick,-latex](2,2.25,4) -- (1,2.5,4) node[anchor=north west] {$\mathbf{a}_\phi$};
+        % \draw[ultra thick,-latex](2,2.25,4) -- (2,2.25,4.75) node[anchor=north west] {$\mathbf{a}_z$};
+        % \draw [thick,->](4,0,0) arc (0:45:4 and 4.5);
+        % \draw (3.6,2,0) node[anchor=north] {$\phi_1$};
+        % \draw[ultra thick,-latex](0,0,0) -- (2,2.35,0);
+        % \draw (1,1,0) node[anchor=north] {$r_1$};
+        % \draw [ultra thick] (2,2.25,4)--(1.95,2.25,0);
+
+        % \draw[ultra thick](0.1,0,4) -- (-0.1,0,4) node[anchor=south west] {$z_1$};
+
+    \end{scope}       
+
+
+    \Shift{\RTest * cos(\thetaTest)}{\RTest * sin(\thetaTest)}{\height}
+    \furtherRotate{\thetaTest - 90}{0}{0}
+    
+    \begin{scope}[tdplot_rotated_coords]
+        \begin{scope} [canvas is plane={O(0,0,0)x(1,0,0)y(0,-1,0)}]
+            \fill [opacity=0.7,yellow,draw=black] (0,0) rectangle (-0.4,0.4);
+        \end{scope}
+
+        \draw [thick, dotted](-3,0,0) -- (3,0,0);        
+        \draw [thick, dotted,  -latex](0,0,0) -- (0,0,{5-\height}) node[anchor= east]{$z'$};        
+        \filldraw[fill=red, nearly transparent, dotted] (-3, 0 ,4.5) -- (3,0,4.5) --  (3,0,0) -- (-3, 0,0) -- (-3, 0,4.5);
+
+        \draw [thick,  -latex] (-3,0,4.5) -- (-4,0,5);   
+
+        \draw (-4,0,5.7) node{$\alpha$ angle rotation plane};
+        \draw (-4,0,5.2) node{Passes tuft position and orthogonal to \textbf{R}};
+
+        \begin{scope} [canvas is plane={O(0,0,0)x(1,0,0)y(0,0,1)}]
+            \tdplotdrawarc[very thick, -latex, black]{(0,0,0)}{3}{90}{90 + \alphaTest }{anchor = south}{$\alpha_{tuft}$};
+        \end{scope}
+
+    \end{scope}
+
+    % \furtherRotate{-90}{90}{90}
+    % \tdplotdrawarc[very thick,tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{0}{\alphaTest }{anchor = east}{$\alpha_{tuft}$};
+    % \furtherRotate{0}{-90}{0}
+    
+    \furtherRotate{0}{-\alphaTest}{0}
+
+    \begin{scope}[tdplot_rotated_coords]
+        \draw [thick, dotted](0,0,0) -- (0,0,5);        
+
+        \filldraw[fill=blue, nearly transparent, dotted] (0, -3 ,5) -- (0,3,5) --  (0,3,0) -- (0, -3,0) -- (0, -3,5);
+
+        \draw [thick,  -latex] (0,3,4.5) -- (0,3.5,4.5);   
+
+        \draw (0,3.5,5) node[anchor = west]{$\beta$ angle rotation plane};
+        \draw (0,3.5,4.5) node[anchor = west]{$\alpha = \alpha_{tuft}$};
+        \draw (0,3.5,4.0) node[anchor = west]{Passes tuft position};
+
+
+        \begin{scope} [canvas is plane={O(0,0,0)x(0,1,0)y(0,0,1)}]
+            \tdplotdrawarc[very thick, -latex, black]{(0,0,0)}{3}{90}{90 - \betaTest }{anchor = south}{$\beta_{tuft}$};
+        \end{scope}
+
+    \end{scope}
+
+    \furtherRotate{-90}{-\betaTest}{90}
+
+
+    \begin{scope}[tdplot_rotated_coords]
+        % \begin{scope} [canvas is plane={O({\xTest},{sin(\phiTest)},{cos(\phiTest)})x({1+\xTest},{sin(\phiTest)},{cos(\phiTest)})y({\xTest},{sin(\phiTest) + 1},{cos(\phiTest)})}]
+        % \begin{scope} [canvas is plane={O(0,0,0)x(1,0,0)y(0,1,0)}]
+        %     \draw [thick](0,0) circle ({\tuftRadius});
+        % \end{scope}
+        % \begin{scope} [canvas is plane={O(0,0,{\tuftLength})x(1,0,{\tuftLength})y(0,1,{\tuftLength})}]
+        %     \draw [thick](0,0) circle ({\tuftRadius});
+        % \end{scope}
+
+        \newcommand{\n}{11}
+        \newcommand{\h}{\tuftLength}
+        \newcommand{\rl}{\tuftRadius}
+        \newcommand{\rh}{\tuftRadius}
+        % \path[draw,fill=white] plot[domain=0:2*pi,samples=4*\n] ({\rl*cos(\x r)}, {\rl*sin(\x r)}, 0);
+        \foreach \t in {1,...,22} {
+            \filldraw[fill=white] ({\rl*cos(\t*pi/\n r)},{\rl*sin(\t*pi/\n r)},0) -- ({\rl*cos((\t+1)*pi/\n r)},{\rl*sin((\t+1)*pi/\n r)},0) -- ({\rh*cos((\t+1)*pi/\n r)},{\rh*sin((\t+1)*pi/\n r)},\h) -- ({\rh*cos(\t*pi/\n r)},{\rh*sin(\t*pi/\n r)},\h) -- cycle;
+        }
+        % \path[draw,fill=white] plot[domain=0:2*pi,samples=4*\n] ({\rh*cos(\x r)}, {\rh*sin(\x r)}, \h);
+        \draw [thick, -latex](0,0,0) -- (0,0,{\tuftLength + 2});
+
+    \end{scope}
+
+
+
+
+
+
+    % \begin{scope}[tdplot_rotated_coords]
+    %     \draw [thick, dotted](0,0,0) -- (0,0,10);        
+    % \end{scope}
+
+    % \furtherRotate{90}{-90}{-90}
+    % \tdplotdrawarc[very thick, tdplot_rotated_coords, -latex, black]{(0,0,0)}{3}{-270}{-270 - \betaTest}{anchor=south}{$\beta$};
+    % \furtherRotate{-90}{-90}{90}
+
+
+
+
+    % \furtherRotate{0}{\betaTest}{0}
+
+
+
+\end{tikzpicture}
+\end{figure}
+\end{document}
